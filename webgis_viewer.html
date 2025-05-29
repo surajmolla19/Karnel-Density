@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebGIS Viewer - livi.geojson</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        #map {{
+            width: 100%;
+            height: 100vh;
+        }}
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        var map = L.map('map').setView([22.57, 88.36], 12); // Approx. Kolkata center
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {{
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }}).addTo(map);
+
+        // Load GeoJSON
+        fetch('livi.geojson')
+            .then(response => response.json())
+            .then(data => {{
+                L.geoJSON(data, {{
+                    style: {{
+                        color: "#ff7800",
+                        weight: 2
+                    }},
+                    onEachFeature: function (feature, layer) {{
+                        if (feature.properties) {{
+                            var popupContent = "";
+                            for (var key in feature.properties) {{
+                                popupContent += "<strong>" + key + ":</strong> " + feature.properties[key] + "<br>";
+                            }}
+                            layer.bindPopup(popupContent);
+                        }}
+                    }}
+                }}).addTo(map);
+            }});
+    </script>
+</body>
+</html>
